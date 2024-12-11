@@ -1,16 +1,18 @@
-import dpsLogo from './assets/DPS.svg';
+// import dpsLogo from './assets/DPS.svg';
 import './App.css';
+import Customer from './components/customer/Customer';
 
 function App() {
 	return (
 		<>
-			<div>
+			{/* <div>
 				<a href="https://www.digitalproductschool.io/" target="_blank">
 					<img src={dpsLogo} className="logo" alt="DPS logo" />
 				</a>
-			</div>
+			</div> */}
 			<div className="home-card">
-				<p>Your solution goes here 😊</p>
+				<Customer />
+				{/* <p>Your solution goes here 😊</p> */}
 			</div>
 		</>
 	);
