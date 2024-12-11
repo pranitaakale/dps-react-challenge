@@ -1,0 +1,7 @@
+.customer {
+	display: flex;
+	justify-content: center;
+}
+.customer_container {
+	width: 90%;
+}
