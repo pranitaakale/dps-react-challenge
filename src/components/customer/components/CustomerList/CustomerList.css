@@ -1,0 +1,49 @@
+.customerList_containerDisplay {
+	max-height: 25rem;
+	margin: 1.5rem 0;
+	overflow-y: auto;
+	border: 0.02rem solid rgb(136, 136, 136);
+}
+.customerList_containerDisplayTable {
+	width: 100%;
+}
+
+/* .customerList_containerDisplayTable thead {
+	border: 0.02rem solid magenta;
+	border: 0.02rem solid rgb(214, 213, 213) !important;
+	height: 2rem;
+} */
+thead th {
+	position: sticky;
+	top: 0;
+	background-color: #797979;
+	z-index: 1;
+	height: 2.5rem;
+}
+
+/* 
+.customerList_containerDisplayTable tbody {
+	border: 0.02rem solid magenta;
+}
+
+.customerList_containerDisplayTable td {
+	border: 0.02rem solid magenta;
+}
+
+.customerList_containerDisplayTable tr {
+	border: 0.02rem solid magenta;
+} */
+
+::-webkit-scrollbar {
+	width: 0.2rem;
+}
+
+::-webkit-scrollbar-track {
+	background: #707070;
+	border-radius: 0.1rem;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #b7b7b7;
+	border-radius: 0.1rem;
+}
