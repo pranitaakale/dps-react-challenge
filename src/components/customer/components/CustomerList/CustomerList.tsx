@@ -24,6 +24,15 @@ const CustomerList = () => {
 			if (data.users.length > 0) {
 				setUserDetails((prevUsers) => [...prevUsers, ...data.users]);
 				setSkip((prevSkip) => prevSkip + limit);
+
+				const cities = data.users
+					.map((user: any) => user.address.city)
+					.filter(
+						(city: string, index: number, self: string[]) =>
+							self.indexOf(city) === index
+					);
+
+				useCustomerStore.getState().setCities(cities);
 			}
 
 			if (skip + limit >= data.total) {

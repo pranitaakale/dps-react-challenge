@@ -5,6 +5,7 @@ import useCustomerStore from '../../../../store/customerStore';
 const CustomerForm = () => {
 	const searchQuery = useCustomerStore((state) => state.searchQuery);
 	const setSearchQuery = useCustomerStore((state) => state.setSearchQuery);
+	const cities = useCustomerStore((state) => state.cities);
 
 	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchQuery(e.target.value);
@@ -57,9 +58,11 @@ const CustomerForm = () => {
 						<option value="" disabled>
 							Select city
 						</option>
-						<option value="1">city1</option>
-						<option value="2">city2</option>
-						<option value="3">city3</option>
+						{cities.map((city, index) => (
+							<option key={index} value={city}>
+								{city}
+							</option>
+						))}
 					</select>
 				</div>
 
