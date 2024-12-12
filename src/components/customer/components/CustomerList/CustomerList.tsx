@@ -5,6 +5,7 @@ import useCustomerStore from '../../../../store/customerStore';
 
 const CustomerList = () => {
 	const searchQuery = useCustomerStore((state) => state.searchQuery);
+	const selectedCity = useCustomerStore((state) => state.selectedCity);
 	const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
 	const [userDetails, setUserDetails] = useState<any[]>([]);
 	const [skip, setSkip] = useState(0);
@@ -65,25 +66,30 @@ const CustomerList = () => {
 	};
 
 	useEffect(() => {
-		if (!searchQuery) {
+		if (!searchQuery && !selectedCity) {
 			setFilteredUsers(userDetails);
 		} else {
 			const filtered = userDetails.filter((user) => {
 				const fullName =
 					`${user.firstName} ${user.lastName}`.toLowerCase();
-				return (
+				const matchesSearch =
 					user.firstName
 						.toLowerCase()
 						.includes(searchQuery.toLowerCase()) ||
 					user.lastName
 						.toLowerCase()
 						.includes(searchQuery.toLowerCase()) ||
-					fullName.includes(searchQuery.toLowerCase())
-				);
+					fullName.includes(searchQuery.toLowerCase());
+
+				const matchesCity = selectedCity
+					? user.address.city === selectedCity
+					: true;
+
+				return matchesSearch && matchesCity;
 			});
 			setFilteredUsers(filtered);
 		}
-	}, [searchQuery, userDetails]);
+	}, [searchQuery, selectedCity, userDetails, setFilteredUsers]);
 
 	useEffect(() => {
 		fetchUsers();

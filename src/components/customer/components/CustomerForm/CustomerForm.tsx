@@ -6,9 +6,15 @@ const CustomerForm = () => {
 	const searchQuery = useCustomerStore((state) => state.searchQuery);
 	const setSearchQuery = useCustomerStore((state) => state.setSearchQuery);
 	const cities = useCustomerStore((state) => state.cities);
+	const setSelectedCity = useCustomerStore((state) => state.setSelectedCity);
+	const selectedCity = useCustomerStore((state) => state.selectedCity);
 
 	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchQuery(e.target.value);
+	};
+
+	const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		setSelectedCity(e.target.value);
 	};
 
 	const [formData, setFormData] = useState({
@@ -51,13 +57,13 @@ const CustomerForm = () => {
 					<select
 						id="city"
 						name="city"
-						value={formData.city}
+						value={selectedCity}
+						// value={formData.city}
+						onChange={handleCityChange}
 						// onChange={handleChange}
 						className="customerform_containerFieldSelect"
 					>
-						<option value="" disabled>
-							Select city
-						</option>
+						<option value="">All Cities</option>
 						{cities.map((city, index) => (
 							<option key={index} value={city}>
 								{city}
