@@ -1,9 +1,12 @@
 import axios from 'axios';
 import { useEffect, useState, useRef } from 'react';
 import './CustomerList.css';
+import useCustomerStore from '../../../../store/customerStore';
 
 const CustomerList = () => {
-	const [userDetails, setUserDetails] = useState<any[]>([]); // TypeScript array type
+	const searchQuery = useCustomerStore((state) => state.searchQuery);
+	const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
+	const [userDetails, setUserDetails] = useState<any[]>([]);
 	const [skip, setSkip] = useState(0);
 	const [hasMore, setHasMore] = useState(true);
 	const observer = useRef<IntersectionObserver | null>(null);
@@ -53,13 +56,34 @@ const CustomerList = () => {
 	};
 
 	useEffect(() => {
+		if (!searchQuery) {
+			setFilteredUsers(userDetails);
+		} else {
+			const filtered = userDetails.filter((user) => {
+				const fullName =
+					`${user.firstName} ${user.lastName}`.toLowerCase();
+				return (
+					user.firstName
+						.toLowerCase()
+						.includes(searchQuery.toLowerCase()) ||
+					user.lastName
+						.toLowerCase()
+						.includes(searchQuery.toLowerCase()) ||
+					fullName.includes(searchQuery.toLowerCase())
+				);
+			});
+			setFilteredUsers(filtered);
+		}
+	}, [searchQuery, userDetails]);
+
+	useEffect(() => {
 		fetchUsers();
 	}, []);
 
 	return (
 		<div className="customerList">
 			<div className="customerList_container">
-				{userDetails && userDetails.length > 0 ? (
+				{filteredUsers && filteredUsers.length > 0 ? (
 					<div className="customerList_containerDisplay">
 						<table className="customerList_containerDisplayTable">
 							<thead>
@@ -70,11 +94,11 @@ const CustomerList = () => {
 								</tr>
 							</thead>
 							<tbody>
-								{userDetails.map((user, index) => (
+								{filteredUsers.map((user, index) => (
 									<tr
 										key={index}
 										ref={
-											index === userDetails.length - 1
+											index === filteredUsers.length - 1
 												? lastUserElementRef
 												: null
 										}
