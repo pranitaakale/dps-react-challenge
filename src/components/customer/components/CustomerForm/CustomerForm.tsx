@@ -1,4 +1,4 @@
-import { useState } from 'react';
+// import { useState } from 'react';
 import './CustomerForm.css';
 import useCustomerStore from '../../../../store/customerStore';
 
@@ -8,6 +8,10 @@ const CustomerForm = () => {
 	const cities = useCustomerStore((state) => state.cities);
 	const setSelectedCity = useCustomerStore((state) => state.setSelectedCity);
 	const selectedCity = useCustomerStore((state) => state.selectedCity);
+	const highlightOldest = useCustomerStore((state) => state.highlightOldest);
+	const setHighlightOldest = useCustomerStore(
+		(state) => state.setHighlightOldest
+	);
 
 	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchQuery(e.target.value);
@@ -17,11 +21,15 @@ const CustomerForm = () => {
 		setSelectedCity(e.target.value);
 	};
 
-	const [formData, setFormData] = useState({
-		name: '',
-		city: '',
-		highlight: false,
-	});
+	const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setHighlightOldest(e.target.checked);
+	};
+
+	// const [formData, setFormData] = useState({
+	// 	name: '',
+	// 	city: '',
+	// 	highlight: false,
+	// });
 
 	// const handleChange = (e: any) => {
 	// 	const { name, value, type, checked } = e.target;
@@ -78,7 +86,9 @@ const CustomerForm = () => {
 						<input
 							type="checkbox"
 							name="highlight"
-							checked={formData.highlight}
+							// checked={formData.highlight}
+							checked={highlightOldest}
+							onChange={handleCheckboxChange}
 							// onChange={handleChange}
 						/>
 					</label>
