@@ -30,7 +30,7 @@ const CustomerList = () => {
 					...user,
 					isHighlighted: false,
 				}));
-				console.log(data);
+				// console.log(data);
 
 				setUserDetails((prevUsers) => [
 					...prevUsers,
@@ -50,7 +50,7 @@ const CustomerList = () => {
 
 			if (skip + limit >= data.total) {
 				// console.log('stopped');
-
+				applyHighlightLogic();
 				setHasMore(false);
 			}
 		} catch (error) {
@@ -61,32 +61,33 @@ const CustomerList = () => {
 	const applyHighlightLogic = () => {
 		let updatedUsers = [...userDetails];
 
-		if (!hasMore && highlightOldest) {
-			const oldestUsers: { [key: string]: any } = {};
+		// if (!hasMore) {
+		const oldestUsers: { [key: string]: any } = {};
 
-			updatedUsers.forEach((user) => {
-				const city = user.address.city;
-				if (
-					!oldestUsers[city] ||
-					new Date(user.birthDate) <
-						new Date(oldestUsers[city].birthDate)
-				) {
-					oldestUsers[city] = user;
-				}
-			});
+		updatedUsers.forEach((user) => {
+			const city = user.address.city;
+			if (
+				!oldestUsers[city] ||
+				new Date(user.birthDate) < new Date(oldestUsers[city].birthDate)
+			) {
+				oldestUsers[city] = user;
+			}
+		});
 
-			updatedUsers = updatedUsers.map((user) => ({
-				...user,
-				isHighlighted: oldestUsers[user.address.city]?.id === user.id,
-			}));
-		} else {
-			updatedUsers = updatedUsers.map((user) => ({
-				...user,
-				isHighlighted: false,
-			}));
-		}
+		updatedUsers = updatedUsers.map((user) => ({
+			...user,
+			isHighlighted: oldestUsers[user.address.city]?.id === user.id,
+		}));
+		// }
+		// else {
+		// 	updatedUsers = updatedUsers.map((user) => ({
+		// 		...user,
+		// 		isHighlighted: false,
+		// 	}));
+		// }
 
-		setFilteredUsers(updatedUsers);
+		// setFilteredUsers(updatedUsers);
+		setUserDetails(updatedUsers);
 	};
 
 	// const lastUserElementRef = (node: HTMLElement | null) => {
@@ -143,11 +144,11 @@ const CustomerList = () => {
 		fetchUsers();
 	}, [userDetails]);
 
-	useEffect(() => {
-		// console.log(userDetails);
+	// useEffect(() => {
+	// 	// console.log(userDetails);
 
-		applyHighlightLogic();
-	}, [hasMore, highlightOldest, userDetails]);
+	// 	applyHighlightLogic();
+	// }, [hasMore, highlightOldest]);
 
 	return (
 		<div className="customerList">
@@ -167,12 +168,16 @@ const CustomerList = () => {
 									<tr
 										key={index}
 										style={{
-											backgroundColor: user.isHighlighted
-												? '#b7b7b7'
-												: 'transparent',
-											color: user.isHighlighted
-												? '#797979'
-												: '#b7b7b7',
+											backgroundColor:
+												user.isHighlighted &&
+												highlightOldest
+													? '#b7b7b7'
+													: 'transparent',
+											color:
+												user.isHighlighted &&
+												highlightOldest
+													? '#797979'
+													: '#b7b7b7',
 										}}
 										// ref={
 										//   index === filteredUsers.length - 1
