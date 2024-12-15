@@ -6,11 +6,14 @@ import useCustomerStore from '../../../../store/customerStore';
 const CustomerList = () => {
 	const searchQuery = useCustomerStore((state) => state.searchQuery);
 	const selectedCity = useCustomerStore((state) => state.selectedCity);
+	const highlightOldest = useCustomerStore((state) => state.highlightOldest);
+
 	const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
 	const [userDetails, setUserDetails] = useState<any[]>([]);
 	const [skip, setSkip] = useState(0);
 	const [hasMore, setHasMore] = useState(true);
-	const observer = useRef<IntersectionObserver | null>(null);
+
+	//   const observer = useRef<IntersectionObserver | null>(null);
 	const limit = 30;
 
 	const fetchUsers = async () => {
@@ -23,7 +26,16 @@ const CustomerList = () => {
 			const data = response.data;
 
 			if (data.users.length > 0) {
-				setUserDetails((prevUsers) => [...prevUsers, ...data.users]);
+				const usersWithHighlight = data.users.map((user: any) => ({
+					...user,
+					isHighlighted: false,
+				}));
+				console.log(data);
+
+				setUserDetails((prevUsers) => [
+					...prevUsers,
+					...usersWithHighlight,
+				]);
 				setSkip((prevSkip) => prevSkip + limit);
 
 				const cities = data.users
@@ -37,6 +49,8 @@ const CustomerList = () => {
 			}
 
 			if (skip + limit >= data.total) {
+				// console.log('stopped');
+
 				setHasMore(false);
 			}
 		} catch (error) {
@@ -44,20 +58,51 @@ const CustomerList = () => {
 		}
 	};
 
-	const lastUserElementRef = (node: HTMLElement | null) => {
-		if (observer.current) observer.current.disconnect();
+	const applyHighlightLogic = () => {
+		let updatedUsers = [...userDetails];
 
-		observer.current = new IntersectionObserver(
-			(entries) => {
-				if (entries[0].isIntersecting && hasMore) {
-					fetchUsers();
+		if (!hasMore && highlightOldest) {
+			const oldestUsers: { [key: string]: any } = {};
+
+			updatedUsers.forEach((user) => {
+				const city = user.address.city;
+				if (
+					!oldestUsers[city] ||
+					new Date(user.birthDate) <
+						new Date(oldestUsers[city].birthDate)
+				) {
+					oldestUsers[city] = user;
 				}
-			},
-			{ threshold: 1.0 }
-		);
+			});
 
-		if (node) observer.current.observe(node);
+			updatedUsers = updatedUsers.map((user) => ({
+				...user,
+				isHighlighted: oldestUsers[user.address.city]?.id === user.id,
+			}));
+		} else {
+			updatedUsers = updatedUsers.map((user) => ({
+				...user,
+				isHighlighted: false,
+			}));
+		}
+
+		setFilteredUsers(updatedUsers);
 	};
+
+	// const lastUserElementRef = (node: HTMLElement | null) => {
+	//   if (observer.current) observer.current.disconnect();
+
+	//   observer.current = new IntersectionObserver(
+	//     (entries) => {
+	//       if (entries[0].isIntersecting && hasMore) {
+	//         fetchUsers();
+	//       }
+	//     },
+	//     { threshold: 1.0 }
+	//   );
+
+	//   if (node) observer.current.observe(node);
+	// };
 
 	const formatDate = (dateString: string) => {
 		if (!dateString) return '';
@@ -69,6 +114,8 @@ const CustomerList = () => {
 		if (!searchQuery && !selectedCity) {
 			setFilteredUsers(userDetails);
 		} else {
+			// console.log(userDetails);
+
 			const filtered = userDetails.filter((user) => {
 				const fullName =
 					`${user.firstName} ${user.lastName}`.toLowerCase();
@@ -87,13 +134,20 @@ const CustomerList = () => {
 
 				return matchesSearch && matchesCity;
 			});
+
 			setFilteredUsers(filtered);
 		}
-	}, [searchQuery, selectedCity, userDetails, setFilteredUsers]);
+	}, [searchQuery, selectedCity, userDetails]);
 
 	useEffect(() => {
 		fetchUsers();
-	}, []);
+	}, [userDetails]);
+
+	useEffect(() => {
+		// console.log(userDetails);
+
+		applyHighlightLogic();
+	}, [hasMore, highlightOldest, userDetails]);
 
 	return (
 		<div className="customerList">
@@ -112,11 +166,19 @@ const CustomerList = () => {
 								{filteredUsers.map((user, index) => (
 									<tr
 										key={index}
-										ref={
-											index === filteredUsers.length - 1
-												? lastUserElementRef
-												: null
-										}
+										style={{
+											backgroundColor: user.isHighlighted
+												? '#b7b7b7'
+												: 'transparent',
+											color: user.isHighlighted
+												? '#797979'
+												: '#b7b7b7',
+										}}
+										// ref={
+										//   index === filteredUsers.length - 1
+										//     ? lastUserElementRef
+										//     : null
+										// }
 									>
 										<td>
 											{[
