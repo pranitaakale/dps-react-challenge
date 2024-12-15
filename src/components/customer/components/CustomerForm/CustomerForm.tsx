@@ -1,6 +1,7 @@
 // import { useState } from 'react';
 import './CustomerForm.css';
 import useCustomerStore from '../../../../store/customerStore';
+import { useEffect, useState } from 'react';
 
 const CustomerForm = () => {
 	const searchQuery = useCustomerStore((state) => state.searchQuery);
@@ -12,10 +13,19 @@ const CustomerForm = () => {
 	const setHighlightOldest = useCustomerStore(
 		(state) => state.setHighlightOldest
 	);
+	const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
 
 	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setSearchQuery(e.target.value);
+		setLocalSearchQuery(e.target.value);
 	};
+
+	useEffect(() => {
+		const debounceTimeout = setTimeout(() => {
+			setSearchQuery(localSearchQuery);
+		}, 1000);
+
+		return () => clearTimeout(debounceTimeout);
+	}, [localSearchQuery, setSearchQuery]);
 
 	const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		setSelectedCity(e.target.value);
@@ -53,7 +63,8 @@ const CustomerForm = () => {
 						type="text"
 						id="name"
 						name="name"
-						value={searchQuery}
+						// value={searchQuery}
+						value={localSearchQuery}
 						onChange={handleSearchChange}
 						// value={formData.name}
 						// onChange={handleChange}
